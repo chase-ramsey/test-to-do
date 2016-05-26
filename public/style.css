@@ -3,6 +3,14 @@
 	color: #fff;
 }
 
+.app {
+	display: none;
+}
+
+.login {
+
+}
+
 .btn {
 	margin: 5px;
 }

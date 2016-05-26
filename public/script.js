@@ -12,7 +12,7 @@ $(() => {
 			});
 		});
 
-	$("form").submit((e) => {
+	$("form.new").submit((e) => {
 		$.ajax({
 			url: `${API_URL}.json`,
 			method: "POST",
@@ -52,6 +52,15 @@ $(() => {
 
 		});
 	});
+
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBdk1zTU2crZvALCbJmyGqKVhmaWc_Ug34",
+    authDomain: "superproductify.firebaseapp.com",
+    databaseURL: "https://superproductify.firebaseio.com",
+    storageBucket: "superproductify.appspot.com",
+  };
+  firebase.initializeApp(config);
 
 })
 
