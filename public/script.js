@@ -16,7 +16,7 @@ $(() => {
 		$.ajax({
 			url: `${API_URL}.json`,
 			method: "POST",
-			data: JSON.stringify({ task: "I was posted!" })
+			data: JSON.stringify(createItem())
 		});
 	})
 
@@ -50,4 +50,14 @@ function addItemToTable (item, id) {
 		</td>
 	</tr>`;
 	$("tbody").append(row);
+}
+
+function Task (description) {
+	this.task = description;
+}
+
+function createItem () {
+	const newDesc = $("input[type=text]").val();
+	const newTask = new Task(newDesc);
+	return newTask;
 }
