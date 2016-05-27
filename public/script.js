@@ -1,16 +1,18 @@
 $(() => {
 	const API_URL	= "https://superproductify.firebaseio.com/";
 	let token = null;
+	let userID = null;
 
 	const getTasks = () => {
+		console.debug("tasks got");
 		$.get({
-			url: `${API_URL}.json?auth=${token}`
+			url: `${API_URL}/${userID}.json?auth=${token}`
 		}).done((data) => {
 				if (data === null) {
 					return;
 				}
 				Object.keys(data).forEach((id) => {
-					addItemToTable(data[id], id);
+					addItemToTable(data[id].task, id);
 				});
 			});
 	}
@@ -18,17 +20,20 @@ $(() => {
 	$(".add form").submit((e) => {
 		// e.preventDefault();
 		$.ajax({
-			url: `${API_URL}.json`,
+			url: `${API_URL}/${userID}.json`,
 			method: "POST",
 			data: JSON.stringify(createItem())
-		}).done();
+		}).done(() => {
+			$("tbody").empty();
+			getTasks();
+		});
 	})
 
-	$('tbody').on("click", ".delete", (e) => {
+	$("tbody").on("click", ".delete", (e) => {
 		const row = $(e.target).closest("tr");
-		const id = row.data("id");
+		const taskID = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}.json?auth=${token}`,
+			url: `${API_URL}/${userID}/${id}.json?auth=${token}`,
 			method: "DELETE"
 		}).done(() => {
 			row.remove();
@@ -39,7 +44,7 @@ $(() => {
 		const row = $(e.target).closest("tr");
 		const id = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}/complete.json?auth=${token}`,
+			url: `${API_URL}/${userID}/${id}/complete.json?auth=${token}`,
 			method: "PUT",
 			data: JSON.stringify("Complete")
 		}).done(() => {
@@ -53,7 +58,7 @@ $(() => {
 		const row = $(e.target).closest("tr");
 		const id = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}/complete.json?auth=${token}`,
+			url: `${API_URL}/${userID}/${id}/complete.json?auth=${token}`,
 			method: "PUT",
 			data: JSON.stringify("Incomplete")
 		}).done(() => {
@@ -61,6 +66,11 @@ $(() => {
 			row.children(".status-text").text("Incomplete");
 			completeColor(row);
 		});
+	});
+
+	$(".logout").click(() => {
+		firebase.auth().signOut();
+		$(".log_status").hide();
 	});
 
   // Initialize Firebase
@@ -115,10 +125,19 @@ $(() => {
 
   firebase.auth().onAuthStateChanged((user) => {
   	if (user) {
+
   		$(".login").hide();
+  		$(".login input[type='text']").val("");
+  		$(".login input[type='password']").val("");
+
   		$(".app").show();
+  		$(".log_status").show();
+  		$(".logged_in_user").text(user.email);
+
+  		userID = user.uid;
   		user.getToken(t => token = t)
   		.then(getTasks);
+
   	} else {
   		$(".app").hide();
   		$(".login").show();
@@ -156,7 +175,8 @@ function Task (description) {
 }
 
 function createItem () {
-	const newDesc = $("input[type=text]").val();
+	const form = $(".add form");
+	const newDesc = form.find("input[type='text']").val();
 	const newTask = new Task(newDesc);
 	return newTask;
 }

@@ -3,12 +3,16 @@
 	color: #fff;
 }
 
+h1 {
+	display: inline-block;
+}
+
 .app {
 	display: none;
 }
 
-.login {
-
+.log_status {
+	display: none;
 }
 
 .btn {
