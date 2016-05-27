@@ -72,49 +72,60 @@ $(() => {
   };
   firebase.initializeApp(config);
 
-// const login = (email, password) => (
-//   firebase.auth().signInWithEmailAndPassword(email, password)
-// )
+// login/register functions
+	// takes email and password values gathered on submit
+	// passes them into the firebase auth() sign-in method, which returns a user
 
-// const register = (user, password) => (
-//   firebase.auth().createUserWithEmailAndPassword(user, password)
-// )
+  const login = (user_email, user_password) => {
+  	return firebase.auth()
+  		.signInWithEmailAndPassword(user_email, user_password);
+  }
 
-//   $('.login form').submit((e) => {
-//     const form = $(e.target);
-//     const email = form.find('input[type="text"]').val();
-//     const password = form.find('input[type="password"]').val();
+  const register = (user_email, user_password) => {
+  	return firebase.auth()
+  		.createUserWithEmailAndPassword(user_email, user_password);
+  }
 
-//     login(email, password)
-//       .then(console.log)
-//       .catch(console.err)
+// Using parentheses a la ES6 would alleviate the need to include the return statement in the functions above
+// I'm leaving them in for now so I can see better exactly how values are getting passed around
+	// The firebase promise is returning the user object into the login/register functions...
+	// ...but they have to be returned out of the login/register functions to be used later
+	// Again, ES6 anonymous functions with parentheses (instead of brackets) automatically return the result, so no return statements would be needed
 
-//     e.preventDefault()
-//   })
+  $(".login form").submit((e) => {
+  	const form = $(e.target);
+  	const email = form.find("input[type='text']").val();
+  	const password = form.find("input[type='password']").val();
+  	login(email, password)
+  		.then(console.log)
+  		.catch(console.error);
+		e.preventDefault();
+  });
 
-//   $('input[value="Register"]').click((e) => {
-//     const form = $(e.target).closest('form');
-//     const email = form.find('input[type="text"]').val();
-//     const password = form.find('input[type="password"]').val();
+  $("input[value='Register']").click((e) => {
+  	const form = $(e.target).closest("form");
+  	const email = form.find("input[type='text']").val();
+  	const password = form.find("input[type='password']").val();
+  	register(email, password)
+  		.then(() => login(email, password))
+  		.then(console.log)
+  		.catch(console.error);
+		e.preventDefault();
+  });
 
-//     register(email, password)
-//       .then(() => login(email, password))
-//       .then(console.log)
-//       .catch(console.err)
-
-//     e.preventDefault()
-//   })
+  firebase.auth().onAuthStateChanged((user) => {
+  	if (user) {
+  		$(".login").hide();
+  		$(".app").show();
+  		user.getToken(t => token = t)
+  		.then(getTasks);
+  	} else {
+  		$(".app").hide();
+  		$(".login").show();
+  	}
+  });
 
 })
-
-
-// CREATE: form submit event to POST data to firebase
-
-// READ: GET data from firebase and display in table
-
-// UPDATE: click event on complete to edit task
-
-// DELETE: click event on delete to delete task
 
 function addItemToTable (item, id) {
 	const row = $(`<tr data-id="${id}">
