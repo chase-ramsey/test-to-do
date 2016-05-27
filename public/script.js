@@ -1,30 +1,34 @@
 $(() => {
 	const API_URL	= "https://superproductify.firebaseio.com/";
+	let token = null;
 
-	$.get({
-		url: `${API_URL}.json`
-	}).done((data) => {
-			if (data === null) {
-				return;
-			}
-			Object.keys(data).forEach((id) => {
-				addItemToTable(data[id], id);
+	const getTasks = () => {
+		$.get({
+			url: `${API_URL}.json?auth=${token}`
+		}).done((data) => {
+				if (data === null) {
+					return;
+				}
+				Object.keys(data).forEach((id) => {
+					addItemToTable(data[id], id);
+				});
 			});
-		});
+	}
 
-	$("form.new").submit((e) => {
+	$(".add form").submit((e) => {
+		// e.preventDefault();
 		$.ajax({
 			url: `${API_URL}.json`,
 			method: "POST",
 			data: JSON.stringify(createItem())
-		});
+		}).done();
 	})
 
 	$('tbody').on("click", ".delete", (e) => {
 		const row = $(e.target).closest("tr");
 		const id = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}.json`,
+			url: `${API_URL}/${id}.json?auth=${token}`,
 			method: "DELETE"
 		}).done(() => {
 			row.remove();
@@ -35,11 +39,11 @@ $(() => {
 		const row = $(e.target).closest("tr");
 		const id = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}/complete.json`,
+			url: `${API_URL}/${id}/complete.json?auth=${token}`,
 			method: "PUT",
 			data: JSON.stringify("Complete")
 		}).done(() => {
-			row.children(".status-text").attr("value", "Complete")
+			row.children(".status-text").attr("value", "Complete");
 			row.children(".status-text").text("Complete");
 			completeColor(row);
 		});
@@ -49,7 +53,7 @@ $(() => {
 		const row = $(e.target).closest("tr");
 		const id = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${id}/complete.json`,
+			url: `${API_URL}/${id}/complete.json?auth=${token}`,
 			method: "PUT",
 			data: JSON.stringify("Incomplete")
 		}).done(() => {
@@ -60,13 +64,13 @@ $(() => {
 	});
 
   // Initialize Firebase
-//   var config = {
-//     apiKey: "AIzaSyBdk1zTU2crZvALCbJmyGqKVhmaWc_Ug34",
-//     authDomain: "superproductify.firebaseapp.com",
-//     databaseURL: "https://superproductify.firebaseio.com",
-//     storageBucket: "superproductify.appspot.com",
-//   };
-//   firebase.initializeApp(config);
+  var config = {
+    apiKey: "AIzaSyBdk1zTU2crZvALCbJmyGqKVhmaWc_Ug34",
+    authDomain: "superproductify.firebaseapp.com",
+    databaseURL: "https://superproductify.firebaseio.com",
+    storageBucket: "superproductify.appspot.com",
+  };
+  firebase.initializeApp(config);
 
 // const login = (email, password) => (
 //   firebase.auth().signInWithEmailAndPassword(email, password)
