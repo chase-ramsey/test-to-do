@@ -1,10 +1,9 @@
 $(() => {
-	const API_URL	= "https://superproductify.firebaseio.com/";
+	const API_URL	= "https://superproductify.firebaseio.com/task";
 	let token = null;
 	let userID = null;
 
 	const getTasks = () => {
-		console.debug("tasks got");
 		$.get({
 			url: `${API_URL}/${userID}.json?auth=${token}`
 		}).done((data) => {
@@ -12,19 +11,20 @@ $(() => {
 					return;
 				}
 				Object.keys(data).forEach((id) => {
-					addItemToTable(data[id].task, id);
+					addItemToTable(data[id], id);
 				});
 			});
 	}
 
 	$(".add form").submit((e) => {
-		// e.preventDefault();
+		e.preventDefault();
 		$.ajax({
-			url: `${API_URL}/${userID}.json`,
+			url: `${API_URL}/${userID}.json?auth=${token}`,
 			method: "POST",
 			data: JSON.stringify(createItem())
 		}).done(() => {
 			$("tbody").empty();
+			$(".add input[type='text']").val("");
 			getTasks();
 		});
 	})
@@ -33,7 +33,7 @@ $(() => {
 		const row = $(e.target).closest("tr");
 		const taskID = row.data("id");
 		$.ajax({
-			url: `${API_URL}/${userID}/${id}.json?auth=${token}`,
+			url: `${API_URL}/${userID}/${taskID}.json?auth=${token}`,
 			method: "DELETE"
 		}).done(() => {
 			row.remove();
@@ -50,7 +50,9 @@ $(() => {
 		}).done(() => {
 			row.children(".status-text").attr("value", "Complete");
 			row.children(".status-text").text("Complete");
-			completeColor(row);
+			row.find(".complete").attr("disabled", "disabled");
+			row.find(".undo_complete").removeAttr("disabled");
+			completeStatus(row);
 		});
 	});
 
@@ -64,7 +66,9 @@ $(() => {
 		}).done(() => {
 			row.children(".status-text").attr("value", "Incomplete");
 			row.children(".status-text").text("Incomplete");
-			completeColor(row);
+			row.find(".undo_complete").attr("disabled", "disabled");
+			row.find(".complete").removeAttr("disabled");
+			completeStatus(row);
 		});
 	});
 
@@ -72,6 +76,7 @@ $(() => {
 		firebase.auth().signOut();
 		$(".log_text").text("Not logged in");
 		$(".logout").attr("disabled", "disabled");
+		$("tbody").empty();
 	});
 
   // Initialize Firebase
@@ -136,8 +141,9 @@ $(() => {
   		$(".logout").removeAttr("disabled");
 
   		userID = user.uid;
-  		user.getToken(t => token = t)
-  		.then(getTasks());
+  		user.getToken()
+  		.then(t => token = t)
+  		.then(getTasks);
 
   	} else {
   		$(".app").hide();
@@ -158,15 +164,17 @@ function addItemToTable (item, id) {
 		<td class="status-text" value="${(item.complete)}">${item.complete}</td>
 	</tr>`);
 	$("tbody").append(row);
-	completeColor(row, item);
+	completeStatus(row, item);
 }
 
-function completeColor (row) {
+function completeStatus (row) {
 	let status = row.children(".status-text").attr("value");
 	if (status === "Incomplete") {
 			row.children(".status-text").addClass("incomplete").removeClass("done");
+			row.find(".undo_complete").attr("disabled", "disabled");
 		} else if (status === "Complete") {
 			row.children(".status-text").addClass("done").removeClass("incomplete");
+			row.find(".complete").attr("disabled", "disabled");
 	}
 }
 
