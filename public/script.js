@@ -70,7 +70,8 @@ $(() => {
 
 	$(".logout").click(() => {
 		firebase.auth().signOut();
-		$(".log_status").hide();
+		$(".log_text").text("Not logged in");
+		$(".logout").attr("disabled", "disabled");
 	});
 
   // Initialize Firebase
@@ -131,12 +132,12 @@ $(() => {
   		$(".login input[type='password']").val("");
 
   		$(".app").show();
-  		$(".log_status").show();
-  		$(".logged_in_user").text(user.email);
+  		$(".log_text").text(`Logged in as ${user.email}`);
+  		$(".logout").removeAttr("disabled");
 
   		userID = user.uid;
   		user.getToken(t => token = t)
-  		.then(getTasks);
+  		.then(getTasks());
 
   	} else {
   		$(".app").hide();
