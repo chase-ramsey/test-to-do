@@ -114,7 +114,10 @@ $(() => {
   	const password = form.find("input[type='password']").val();
   	login(email, password)
   		.then(console.log)
-  		.catch(console.error);
+  		.catch((error) => {
+  			alert(error);
+  			console.error(error);
+  		});
 		e.preventDefault();
   });
 
