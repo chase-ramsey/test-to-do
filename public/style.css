@@ -1,0 +1,28 @@
+.navbar-default {
+	background: #3498db;
+	color: #fff;
+}
+
+h1 {
+	display: inline-block;
+}
+
+.app {
+	display: none;
+}
+
+.btn {
+	margin: 5px;
+}
+
+.table-hover tbody tr:hover {
+	background: rgba(46, 204, 113, .1);
+}
+
+.incomplete {
+	color: #e74c3c;
+}
+
+.done {
+	color: #2ecc71;
+}
