@@ -97,10 +97,10 @@ $(() => {
   		.signInWithEmailAndPassword(user_email, user_password);
   }
 
-  const register = (user_email, user_password) => {
-  	return firebase.auth()
-  		.createUserWithEmailAndPassword(user_email, user_password);
-  }
+  // const register = (user_email, user_password) => {
+  // 	return firebase.auth()
+  // 		.createUserWithEmailAndPassword(user_email, user_password);
+  // }
 
 // Using parentheses a la ES6 would alleviate the need to include the return statement in the functions above
 // I'm leaving them in for now so I can see better exactly how values are getting passed around
@@ -121,16 +121,16 @@ $(() => {
 		e.preventDefault();
   });
 
-  $("input[value='Register']").click((e) => {
-  	const form = $(e.target).closest("form");
-  	const email = form.find("input[type='text']").val();
-  	const password = form.find("input[type='password']").val();
-  	register(email, password)
-  		.then(() => login(email, password))
-  		.then(console.log)
-  		.catch(console.error);
-		e.preventDefault();
-  });
+  // $("input[value='Register']").click((e) => {
+  // 	const form = $(e.target).closest("form");
+  // 	const email = form.find("input[type='text']").val();
+  // 	const password = form.find("input[type='password']").val();
+  // 	register(email, password)
+  // 		.then(() => login(email, password))
+  // 		.then(console.log)
+  // 		.catch(console.error);
+		// e.preventDefault();
+  // });
 
   firebase.auth().onAuthStateChanged((user) => {
   	if (user) {
